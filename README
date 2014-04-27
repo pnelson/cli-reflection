@@ -60,3 +60,5 @@ Try building and running your application again:
       -example=<value>                         An example string option.
       -number=<n>                              An example int option.
       -show-extra                              Print extra arguments.
+
+Copyright (c) 2014 by Philip Nelson. See LICENSE for details.
