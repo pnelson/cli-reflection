@@ -23,7 +23,8 @@ import (
 	"strings"
 )
 
-type application struct {
+// An Application represents a command line application.
+type Application struct {
 	name    string
 	version string
 	rules   map[string]*rule
@@ -52,9 +53,9 @@ var (
 	errRunReturnValue = fmt.Errorf("rule: first return value for Run must be int")
 )
 
-// New creates a basic application with help and version commands.
-func New(name, version string) *application {
-	app := &application{
+// New creates a basic Application with help and version commands.
+func New(name, version string) *Application {
+	app := &Application{
 		name:    name,
 		version: version,
 		rules:   make(map[string]*rule),
@@ -66,7 +67,7 @@ func New(name, version string) *application {
 	return app
 }
 
-// Rule registers a command with the application.
+// Rule registers a command with the Application.
 //
 // The command being registered must meet the requirements of the fmt.Stringer
 // interface. The command must also have a method Flags that accepts a new
@@ -84,7 +85,7 @@ func New(name, version string) *application {
 // arguments, they will silently be ignored. Optionally, the last parameter of
 // the Run method can be of type []string. In this case, any extra parameters
 // will be passed to the final argument.
-func (a *application) Rule(command command, name, arguments string) error {
+func (a *Application) Rule(command command, name, arguments string) error {
 	// Find the Run method dynamically.
 	method, ok := reflect.TypeOf(command).MethodByName("Run")
 	if !ok {
@@ -134,7 +135,7 @@ func (a *application) Rule(command command, name, arguments string) error {
 }
 
 // Run will parse flags and dispatch to the command.
-func (a *application) Run() {
+func (a *Application) Run() {
 	flag.Usage = a.usage
 	flag.Parse()
 
@@ -201,7 +202,7 @@ func (a *application) Run() {
 }
 
 // Find the longest rule and return its length.
-func (a *application) getRuleLength() int {
+func (a *Application) getRuleLength() int {
 	max := 0
 	for _, rule := range a.rules {
 		length := len(rule.String())
@@ -215,7 +216,7 @@ func (a *application) getRuleLength() int {
 }
 
 // PrintUsage pretty prints the application usage across all commands.
-func (a *application) printUsage(w io.Writer) {
+func (a *Application) printUsage(w io.Writer) {
 	length := a.getRuleLength()
 	fmt.Fprintf(w, "Usage: %s <cmd> [options] [<args>]\n", a.name)
 	for _, rule := range a.rules {
@@ -248,7 +249,7 @@ func (a *application) printUsage(w io.Writer) {
 }
 
 // Usage is called on flag parsing errors.
-func (a *application) usage() {
+func (a *Application) usage() {
 	a.printUsage(os.Stderr)
 }
 
