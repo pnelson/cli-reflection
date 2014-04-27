@@ -1,0 +1,62 @@
+cli
+===
+
+Package cli provides structure for command line applications with sub-commands.
+
+This package uses a touch of reflection magic to dispatch to a method with
+named arguments. Commands help and version are implemented by default. The
+usage information is pretty printed in an opinionated format.
+
+The most basic cli application is boring:
+
+  app := cli.New("myapp", "0.0.1")
+  app.Run()
+
+Build and run your application:
+
+  $ ./myapp
+  Usage: myapp <cmd> [options] [<args>]
+    help      Output this usage information.
+    version   Output the application version
+
+Add commands:
+
+  type add struct {
+    showExtra *bool
+    example   *string
+    number    *int
+  }
+
+  func (c *add) Flags(flags *flag.FlagSet) {
+    c.showExtra = flags.Bool("show-extra", false, "Print extra arguments.")
+    c.example = flags.String("example", "", "An example string option.")
+    c.number = flags.Int("number", 0, "An example int option.")
+  }
+
+  func (c *add) Run(key, username string, extra []string) {
+    fmt.Printf("%s => %s\n", key, username)
+    if *c.showExtra {
+      fmt.Printf("  %v\n", extra)
+    }
+  }
+
+  func (c *add) String() string {
+    return "Add record key with username."
+  }
+
+  func main() {
+    app := cli.New("myapp", "0.0.1")
+    app.Rule(&add{}, "add", "<key> <username> [<extra>]")
+    app.Run()
+  }
+
+Try building and running your application again:
+
+  $ ./myapp
+  Usage: myapp <cmd> [options] [<args>]
+    help                                       Output this usage information.
+    version                                    Output the application version.
+    add [options] <key> <username> [<extra>]   Add record key with username.
+      -example=<value>                         An example string option.
+      -number=<n>                              An example int option.
+      -show-extra                              Print extra arguments.
