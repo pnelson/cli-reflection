@@ -1,6 +1,10 @@
 cli
 ===
 
+Note: I don't really like this structure any more. I've opted for a more
+simple, reflection-free structure. See https://github.com/pnelson/cli and
+consider this package deprecated.
+
 Package cli provides structure for command line applications with sub-commands.
 
 This package uses a touch of reflection magic to dispatch to a method with
